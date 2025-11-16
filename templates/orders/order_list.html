@@ -1,4 +1,4 @@
-{% extends 'base.html' %} {% block title %}Products List{% endblock %} {% block content %}
+{% extends 'base.html' %} {% block title %}Order List{% endblock %} {% block content %}
 
 <div>
   <form method="GET" class="form-inline my-3" action="#">
@@ -16,7 +16,7 @@
     </a>
   </form>
   <div>
-    <table class="table table-hover table-dark small">
+    <table class="table table-hover table-dark small align-middle">
       <thead>
         <tr>
           <th scope="col">#</th>
@@ -26,6 +26,7 @@
           <th scope="col">Update Date</th>
           <th scope="col">Edit</th>
           <th scope="col">Delete</th>
+          <th scope="col"></th>
         </tr>
       </thead>
       <tbody>
@@ -37,17 +38,18 @@
           <td>{{order.created_at | date:"Y-m-d"}}</td>
           <td>{{order.updated_at | date:"Y-m-d"}}</td>
           <td>
-            <a href="#">
+            <a href="{% url 'order_details' order.pk %}">
               <button type="button" class="btn btn-primary">Edit</button>
             </a>
           </td>
           <td>
             <a href="#" class="btn btn-danger">Delete</a>
           </td>
+          <td><input type="checkbox" value="{{order.id}}" /></td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
-    {% endblock %}
   </div>
 </div>
+{% endblock %}

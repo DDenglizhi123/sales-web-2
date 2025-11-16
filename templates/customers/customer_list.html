@@ -1,0 +1,56 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Customer List{% endblock %}
+
+{% block content %}
+
+    <div>
+        <form method="GET" class="form-inline my-3" action="{% url 'customer_list' %}">
+            <label for="search" class="mr-2">Search:</label>
+            <input type="text" name="search" class="form-control mr-2 search-input" placeholder="Search by name, TIN, VRN..." value="{{ query }}">
+            <button style="margin-right: 10px" type="submit" class="btn btn-primary">Search</button>
+            <a href="{% url 'customer_create' %}">
+                <button type="button" class="btn btn-success">+ New Customer</button>
+            </a>
+        </form>
+    <div>
+    <table class="table table-hover table-dark small">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Customer Name</th>
+                <th scope="col">Name In Short</th>
+                <th scope="col">TIN</th>
+                <th scope="col">VRN</th>
+                <th scope="col">BUSINESS TYPE</th>
+                <th scope="col">Creat Time</th>
+                <th scope="col">Update Time</th>
+                <th scope="col">Edit</th>
+                <th scope="col">Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for customer in customers %}
+            <tr>
+                <td>{{customer.id}}</td>
+                <td>{{customer.name | truncatechars:15}}</td>
+                <td>{{customer.name_in_short}}</td>
+                <td>{{customer.TIN}}</td>
+                <td>{{customer.VRN}}</td>
+                <td>{{customer.business_type}}</td>
+                <td>{{customer.created_at | date:"Y-m-d"}}</td>
+                <td>{{customer.updated_at | date:"Y-m-d"}}</td>
+                <td>
+                    <a href="{% url 'customer_update' customer.pk %}">
+                    <button type="button" class="btn btn-primary">Edit</button>
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url 'customer_delete' customer.pk %}" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

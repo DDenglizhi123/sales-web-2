@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+*.so
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+
+# Database (ignore sqlite, though you use MySQL)
+db.sqlite3
+
+# Media & static (generated, not source)
+media/
+staticfiles/
+
+# Migrations cache (but keep migration .py files)
+*/migrations/__pycache__/
+
+# Virtual environment
+venv/
+.env
+*.env
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# System files
+.DS_Store
+Thumbs.db
+EOF
+config/settings.py

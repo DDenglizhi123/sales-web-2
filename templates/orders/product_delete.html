@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+   
+    <form action="" method="post">
+        {% csrf_token %}
+        <!-- Form fields go here -->
+         <h1>Confirm?</h1>
+        <div class="alert alert-danger" role="alert">
+            <p> Are you sure that you want to delete &quot;<span style="font-weight: bold">{{ product.name }}</span>&quot;?</p>
+        </div>
+        <button type="submit" class="btn btn-outline-success">Confirm</button>
+        <a href="{% url 'item_list' %}">
+            <button type="button" class="btn btn-outline-danger">Cancel</button>
+        </a>
+    </form>
+    
+{% endblock %}
+

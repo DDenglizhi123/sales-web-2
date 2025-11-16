@@ -33,7 +33,11 @@
         {% for order in orders %}
         <tr>
           <td>{{order.id}}</td>
-          <td>{{order.customer.name}}</td>
+          <td>
+            <a href="{% url 'order_details' order.pk %}" style="text-decoration: none; color: inherit"
+              >{{order.customer.name}}</a
+            >
+          </td>
           <td>{{order.order_number}}</td>
           <td>{{order.created_at | date:"Y-m-d"}}</td>
           <td>{{order.updated_at | date:"Y-m-d"}}</td>

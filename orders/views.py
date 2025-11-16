@@ -28,3 +28,6 @@ def order_details(request, pk):
         'order_number': order_number,
         }
     return render(request, 'orders/order_details.html', contexts)
+
+def delivery_order(request):
+    return render(request, 'orders/delivery_order.html')

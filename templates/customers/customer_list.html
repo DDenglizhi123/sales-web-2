@@ -34,7 +34,11 @@
         {% for customer in customers %}
             <tr>
                 <td>{{customer.id}}</td>
-                <td>{{customer.name | truncatechars:15}}</td>
+                <td>
+                    <a href="{% url 'customer_orders' customer.id %}" style="text-decoration: none; color: inherit">
+                        {{customer.name | truncatechars:15}}
+                    </a>
+                </td>
                 <td>{{customer.name_in_short}}</td>
                 <td>{{customer.TIN}}</td>
                 <td>{{customer.VRN}}</td>

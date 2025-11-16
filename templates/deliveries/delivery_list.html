@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}Delivery List{% endblock %}
+{% block content %}
+
+<div>
+  <form method="GET" class="form-inline my-3" action="#">
+    <label for="search" class="mr-2">Search:</label>
+    <input
+      type="text"
+      name="search"
+      class="form-control mr-2 search-input"
+      placeholder="Search by Delivery Number, Order Number, Customer, Vehicle Number"
+      value="{{ query }}"
+    />
+    <button style="margin-right: 10px" type="submit" class="btn btn-primary">Search</button>
+  </form>
+  
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  {% endif %}
+  
+  <div>
+    <table class="table table-hover table-dark small align-middle">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Delivery Number</th>
+          <th scope="col">Order Number</th>
+          <th scope="col">Customer</th>
+          <th scope="col">Delivery Date</th>
+          <th scope="col">Vehicle Number</th>
+          <th scope="col">Driver Phone</th>
+          <th scope="col">Status</th>
+          <th scope="col">Confirm Delivery</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for delivery in deliveries %}
+        <tr>
+          <td>{{ delivery.id }}</td>
+          <td>
+            <strong class="{% if delivery.delivery_number %}text-success{% else %}text-warning{% endif %}">
+              {{ delivery.delivery_number|default:"未填写" }}
+            </strong>
+          </td>
+          <td>
+            <a href="{% url 'order_details' delivery.order.id %}" style="text-decoration: none; color: inherit">
+              {{ delivery.order.order_number }}
+            </a>
+          </td>
+          <td>{{ delivery.customer.name|default:"-" }}</td>
+          <td>{{ delivery.delivery_date|date:"Y-m-d" }}</td>
+          <td>{{ delivery.vehicle_number }}</td>
+          <td>{{ delivery.driver_phone }}</td>
+          <td>
+            {% if delivery.status == 'DELIVERED' %}
+              <span class="badge badge-success">已送达</span>
+            {% elif delivery.status == 'IN_TRANSIT' %}
+              <span class="badge badge-info">运输中</span>
+            {% elif delivery.status == 'PENDING' %}
+              <span class="badge badge-warning">待发货</span>
+            {% elif delivery.status == 'CANCELLED' %}
+              <span class="badge badge-danger">已取消</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if not delivery.delivery_number %}
+              <form method="POST" class="d-inline" onsubmit="return confirm('确认填写发货单号并标记为已发货？');">
+                {% csrf_token %}
+                <input type="hidden" name="delivery_id" value="{{ delivery.id }}">
+                <div class="input-group input-group-sm">
+                  <input 
+                    type="text" 
+                    name="delivery_number" 
+                    class="form-control" 
+                    placeholder="发货单号" 
+                    required
+                    style="width: 120px;"
+                  >
+                  <div class="input-group-append">
+                    <button type="submit" class="btn btn-success btn-sm">确认</button>
+                  </div>
+                </div>
+              </form>
+            {% else %}
+              <span class="text-success">已确认</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="9" class="text-center">没有找到发货单</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+

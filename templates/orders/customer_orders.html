@@ -1,32 +1,35 @@
-{% extends 'base.html' %} {% block title %}Order List{% endblock %} {% block content %}
+{% extends 'base.html' %}
+{% block title %}Orders for {{ customer.name }}{% endblock %}
+{% block content %}
 
 <div>
+  <div class="mb-3">
+    <h2>客户订单列表: {{ customer.name }}</h2>
+    <a href="{% url 'order_list' %}" class="btn btn-secondary btn-sm">返回所有订单</a>
+  </div>
+  
   <form method="GET" class="form-inline my-3" action="#">
     <label for="search" class="mr-2">Search:</label>
     <input
       type="text"
       name="search"
       class="form-control mr-2 search-input"
-      placeholder="Search by Item Name, Keywords etc"
+      placeholder="Search by Order Number, Product Name"
       value="{{ query }}"
     />
     <button style="margin-right: 10px" type="submit" class="btn btn-primary">Search</button>
-    <a href="#">
-      <button type="button" class="btn btn-success">+ Add Item</button>
-    </a>
   </form>
+  
   <div>
     <table class="table table-hover table-dark small align-middle">
       <thead>
         <tr>
           <th scope="col">#</th>
-          <th scope="col">Customer Name</th>
           <th scope="col">Order Number</th>
           <th scope="col">Create Date</th>
           <th scope="col">Update Date</th>
           <th scope="col">Edit</th>
           <th scope="col">Delete</th>
-          <th scope="col"></th>
         </tr>
       </thead>
       <tbody>
@@ -34,11 +37,10 @@
         <tr>
           <td>{{order.id}}</td>
           <td>
-            <a href="{% url 'customer_orders' order.customer.id %}" style="text-decoration: none; color: inherit"
-              >{{order.customer.name}}</a
-            >
+            <a href="{% url 'order_details' order.pk %}" style="text-decoration: none; color: inherit">
+              {{order.order_number}}
+            </a>
           </td>
-          <td>{{order.order_number}}</td>
           <td>{{order.created_at | date:"Y-m-d"}}</td>
           <td>{{order.updated_at | date:"Y-m-d"}}</td>
           <td>
@@ -49,11 +51,16 @@
           <td>
             <a href="#" class="btn btn-danger">Delete</a>
           </td>
-          <td><input type="checkbox" value="{{order.id}}" /></td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="text-center">该客户暂无订单</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
+
 {% endblock %}
+

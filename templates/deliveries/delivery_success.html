@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}发货单创建成功{% endblock %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h2 class="mb-0">发货单创建成功</h2>
+                </div>
+                <div class="card-body">
+                    <!-- 发货单信息 -->
+                    <div class="mb-4">
+                        <h4>发货单信息</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>发货单号：</strong>{{ delivery.delivery_number|default:"未填写" }}</p>
+                                <p><strong>订单号：</strong>{{ delivery.order.order_number }}</p>
+                                <p><strong>客户：</strong>{{ delivery.customer.name|default:"未填写" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>发货日期：</strong>{{ delivery.delivery_date }}</p>
+                                <p><strong>货车号码：</strong>{{ delivery.vehicle_number }}</p>
+                                <p><strong>司机电话：</strong>{{ delivery.driver_phone }}</p>
+                                {% if delivery.driver_name %}
+                                <p><strong>司机姓名：</strong>{{ delivery.driver_name }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 产品信息 -->
+                    <div class="mb-4">
+                        <h4>产品信息</h4>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>产品名称</th>
+                                    <th>发货数量</th>
+                                    <th>单位</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in delivery_items %}
+                                <tr>
+                                    <td>{{ item.order_item.product.item_name }}</td>
+                                    <td>{{ item.delivered_quantity }}</td>
+                                    <td>{{ item.order_item.product.unit }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 可复制内容 -->
+                    <div class="mb-4">
+                        <h4>可复制内容</h4>
+                        <div class="input-group">
+                            <textarea id="copyContent" class="form-control" rows="10" readonly>{{ copy_content }}</textarea>
+                            <button class="btn btn-primary" type="button" onclick="copyToClipboard()">复制</button>
+                        </div>
+                        <small class="form-text text-muted">点击复制按钮将内容复制到剪贴板</small>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'order_details' delivery.order.id %}" class="btn btn-outline-primary">返回订单详情</a>
+                        <a href="{% url 'order_list' %}" class="btn btn-outline-secondary">返回订单列表</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard() {
+    const textarea = document.getElementById('copyContent');
+    textarea.select();
+    textarea.setSelectionRange(0, 99999); // For mobile devices
+    
+    try {
+        document.execCommand('copy');
+        alert('内容已复制到剪贴板！');
+    } catch (err) {
+        // Fallback for modern browsers
+        navigator.clipboard.writeText(textarea.value).then(function() {
+            alert('内容已复制到剪贴板！');
+        }, function(err) {
+            alert('复制失败，请手动选择文本复制');
+        });
+    }
+}
+</script>
+
+{% endblock %}

@@ -1,4 +1,6 @@
-{% extends 'base.html' %} {% block title %}Products List{% endblock %} {% block content %}
+{% extends 'base.html' %}
+{% block title %}Order Details{% endblock %}
+{% block content %}
 
 <div>
   <form method="GET" class="form-inline my-3" action="#">
@@ -14,9 +16,7 @@
     <a href="#">
       <button type="button" class="btn btn-success">+ Add Item</button>
     </a>
-    <a href="#">
-      <button type="button" class="btn btn-warning">Create Delivery Order</button>
-    </a>
+    <button type="button" class="btn btn-warning" id="createDeliveryBtn" onclick="createDelivery()">Create Delivery Order</button>
   </form>
   <div>
     <h2>Order Details:</h2>
@@ -39,21 +39,32 @@
     <table class="table table-hover table-dark small">
       <thead>
         <tr>
+          <th scope="col">
+            <input type="checkbox" id="selectAll" onclick="toggleAll()">
+          </th>
           <th scope="col">Item Name</th>
           <th scope="col">Unit</th>
           <th scope="col">Unit Price</th>
-          <th scope="col">Quantity</th>
+          <th scope="col">Order Quantity</th>
+          <th scope="col">Delivered</th>
+          <th scope="col">Remaining</th>
           <th scope="col">Edit</th>
           <th scope="col">Delete</th>
         </tr>
       </thead>
       <tbody>
-        {% for order_detail in order_details %}
+        {% for item_data in order_items_with_delivery %}
+        {% with item=item_data.order_item %}
         <tr>
-          <td>{{order_detail.product.item_name}}</td>
-          <td>{{order_detail.product.unit}}</td>
-          <td>{{order_detail.unit_price}}</td>
-          <td>{{order_detail.quantity}}</td>
+          <td>
+            <input type="checkbox" class="order-item-checkbox" value="{{item.id}}" name="order_items">
+          </td>
+          <td>{{item.product.item_name}}</td>
+          <td>{{item.product.unit}}</td>
+          <td>{{item.unit_price}}</td>
+          <td>{{item.quantity}}</td>
+          <td>{{item_data.delivered_total}}</td>
+          <td><strong class="text-warning">{{item_data.remaining_quantity}}</strong></td>
           <td>
             <a href="#">
               <button type="button" class="btn btn-primary">Edit</button>
@@ -63,9 +74,35 @@
             <a href="#" class="btn btn-danger">Delete</a>
           </td>
         </tr>
+        {% endwith %}
         {% endfor %}
       </tbody>
     </table>
-    {% endblock %}
   </div>
 </div>
+
+{% block extra_js %}
+<script>
+function toggleAll() {
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.order-item-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAll.checked;
+    });
+}
+
+function createDelivery() {
+    const checkboxes = document.querySelectorAll('.order-item-checkbox:checked');
+    if (checkboxes.length === 0) {
+        alert('请至少选择一个产品');
+        return;
+    }
+    
+    const orderItemIds = Array.from(checkboxes).map(cb => cb.value).join(',');
+    const orderId = {{ order.id }};
+    const url = '{% url "create_delivery" %}?order_id=' + orderId + '&order_items=' + orderItemIds;
+    window.location.href = url;
+}
+</script>
+{% endblock %}
+{% endblock %}

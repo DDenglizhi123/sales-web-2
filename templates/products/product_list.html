@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block title %}Products List{% endblock %} {% block content %}
 
 <div>
-  <form method="GET" class="form-inline my-3" action="{% url 'item_list' %}">
+  <form method="GET" class="form-inline my-3" action="#">
     <label for="search" class="mr-2">Search:</label>
     <input
       type="text"
@@ -11,7 +11,7 @@
       value="{{ query }}"
     />
     <button style="margin-right: 10px" type="submit" class="btn btn-primary">Search</button>
-    <a href="{% url 'item_create' %}">
+    <a href="#">
       <button type="button" class="btn btn-success">+ Add Item</button>
     </a>
   </form>
@@ -22,10 +22,7 @@
           <th scope="col">#</th>
           <th scope="col">Item Name</th>
           <th scope="col">Unit</th>
-          <th scope="col">Price</th>
-          <th scope="col">Stock</th>
-          <th scope="col">Weight</th>
-          <th scope="col">Item Number</th>
+          <th scope="col">Base Price</th>
           <th scope="col">Created At</th>
           <th scope="col">Updated At</th>
           <th scope="col">Edit</th>
@@ -38,10 +35,7 @@
           <td>{{product.id}}</td>
           <td>{{product.item_name | truncatechars:20}}</td>
           <td>{{product.unit}}</td>
-          <td>{{product.price}}</td>
-          <td>{{product.stock_quantity}}</td>
-          <td>{{product.weight_in_kg}}</td>
-          <td>{{product.item_number}}</td>
+          <td>{{product.base_price}}</td>
           <td>{{product.created_at | date:"Y-m-d"}}</td>
           <td>{{product.updated_at | date:"Y-m-d"}}</td>
           <td>

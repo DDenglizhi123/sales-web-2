@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}Create Order{% endblock %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Create Order</h2>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" id="orderForm" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <h4>Order Information</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ order_form.order_number.id_for_label }}" class="form-label fw-bold">
+                                    {{ order_form.order_number.label }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {{ order_form.order_number }}
+                                {% for error in order_form.order_number.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ order_form.customer.id_for_label }}" class="form-label fw-bold">
+                                    {{ order_form.customer.label }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {{ order_form.customer }}
+                                {% for error in order_form.customer.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <h4 class="mt-4">Order Items</h4>
+                        <div id="orderItemsContainer">
+                            <div class="order-item-row mb-3 p-3 border rounded">
+                                <div class="row">
+                                    <div class="col-md-5 mb-2">
+                                        <label class="form-label fw-bold">Product <span class="text-danger">*</span></label>
+                                        <select name="product_ids" class="form-control product-select" required>
+                                            <option value="">Select a product</option>
+                                            {% for product in products %}
+                                                <option value="{{ product.id }}" data-price="{{ product.base_price }}">
+                                                    {{ product.item_name }} ({{ product.unit }})
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 mb-2">
+                                        <label class="form-label fw-bold">Quantity <span class="text-danger">*</span></label>
+                                        <input type="number" name="quantities" class="form-control quantity-input" min="1" value="1" required>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <label class="form-label fw-bold">Unit Price <span class="text-danger">*</span></label>
+                                        <input type="number" name="unit_prices" class="form-control price-input" step="0.01" min="0" required>
+                                    </div>
+                                    <div class="col-md-2 mb-2 d-flex align-items-end">
+                                        <button type="button" class="btn btn-danger btn-sm remove-item">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn btn-secondary btn-sm mb-3" id="addItemBtn">+ Add Item</button>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">Create Order</button>
+                            <a href="{% url 'order_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input.form-control, select.form-control {
+        border-radius: 0.375rem;
+    }
+    .invalid-feedback {
+        font-size: 0.875rem;
+    }
+    .form-label {
+        margin-bottom: 0.5rem;
+    }
+    .order-item-row {
+        background-color: #f8f9fa;
+    }
+</style>
+
+<script>
+    (function () {
+        'use strict'
+        
+        // Add item functionality
+        document.getElementById('addItemBtn').addEventListener('click', function() {
+            const container = document.getElementById('orderItemsContainer');
+            const firstRow = container.querySelector('.order-item-row');
+            const newRow = firstRow.cloneNode(true);
+            
+            // Clear values
+            newRow.querySelector('.product-select').value = '';
+            newRow.querySelector('.quantity-input').value = '1';
+            newRow.querySelector('.price-input').value = '';
+            
+            // Add remove functionality
+            newRow.querySelector('.remove-item').addEventListener('click', function() {
+                const container = document.getElementById('orderItemsContainer');
+                const rows = container.querySelectorAll('.order-item-row');
+                
+                // Ensure at least one row remains
+                if (rows.length > 1) {
+                    newRow.remove();
+                } else {
+                    alert('At least one order item is required');
+                }
+            });
+            
+            // Add product change handler
+            newRow.querySelector('.product-select').addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const price = selectedOption.getAttribute('data-price');
+                if (price) {
+                    newRow.querySelector('.price-input').value = parseFloat(price).toFixed(2);
+                }
+            });
+            
+            container.appendChild(newRow);
+        });
+        
+        // Remove item functionality
+        document.querySelectorAll('.remove-item').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const container = document.getElementById('orderItemsContainer');
+                const rows = container.querySelectorAll('.order-item-row');
+                
+                // Ensure at least one row remains
+                if (rows.length > 1) {
+                    this.closest('.order-item-row').remove();
+                } else {
+                    alert('At least one order item is required');
+                }
+            });
+        });
+        
+        // Product change handler for first row
+        document.querySelector('.product-select').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const price = selectedOption.getAttribute('data-price');
+            if (price) {
+                this.closest('.order-item-row').querySelector('.price-input').value = parseFloat(price).toFixed(2);
+            }
+        });
+        
+        // Form validation
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                // Check if at least one item is filled
+                const productSelects = form.querySelectorAll('.product-select');
+                let hasItem = false;
+                
+                productSelects.forEach(function(select) {
+                    if (select.value) {
+                        hasItem = true;
+                    }
+                });
+                
+                if (!hasItem) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    alert('Please add at least one order item');
+                    return false;
+                }
+                
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false)
+        });
+    })()
+</script>
+
+{% endblock %}
+

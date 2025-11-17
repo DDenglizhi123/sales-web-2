@@ -1,8 +1,11 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 from .models import Order, OrderItem
+from .forms import OrderForm, OrderItemForm
 from django.db.models import Q, Sum
 from deliveries.models import DeliveryItem
 from customers.models import Customer
+from products.models import Products
 
 # Create your views here.
 def order_list(request):
@@ -75,3 +78,68 @@ def customer_orders(request, customer_id):
         'query': query,
     }
     return render(request, 'orders/customer_orders.html', context)
+
+
+def create_order(request):
+    """创建订单视图"""
+    if request.method == 'POST':
+        order_form = OrderForm(request.POST)
+        
+        if order_form.is_valid():
+            order = order_form.save()
+            
+            # 处理订单项
+            product_ids = request.POST.getlist('product_ids')
+            quantities = request.POST.getlist('quantities')
+            unit_prices = request.POST.getlist('unit_prices')
+            
+            # 验证是否有订单项
+            if not product_ids or not any(product_ids):
+                messages.error(request, 'Please add at least one order item')
+                context = {
+                    'order_form': order_form,
+                    'order_item_form': OrderItemForm(),
+                    'products': Products.objects.all(),
+                }
+                return render(request, 'orders/order_form.html', context)
+            
+            # 创建订单项
+            order_items_created = False
+            for product_id, quantity, unit_price in zip(product_ids, quantities, unit_prices):
+                if product_id and quantity and unit_price:
+                    try:
+                        product = Products.objects.get(id=int(product_id))
+                        OrderItem.objects.create(
+                            order=order,
+                            product=product,
+                            quantity=int(quantity),
+                            unit_price=float(unit_price)
+                        )
+                        order_items_created = True
+                    except (Products.DoesNotExist, ValueError) as e:
+                        messages.error(request, f'Error creating order item: {str(e)}')
+            
+            if order_items_created:
+                messages.success(request, f'Order {order.order_number} created successfully')
+                return redirect('order_details', pk=order.id)
+            else:
+                # 如果没有成功创建任何订单项，删除订单
+                order.delete()
+                messages.error(request, 'Failed to create order items. Order not created.')
+                context = {
+                    'order_form': OrderForm(),
+                    'order_item_form': OrderItemForm(),
+                    'products': Products.objects.all(),
+                }
+                return render(request, 'orders/order_form.html', context)
+        else:
+            messages.error(request, 'Please correct the errors below')
+    else:
+        order_form = OrderForm()
+    
+    context = {
+        'order_form': order_form,
+        'order_item_form': OrderItemForm(),
+        'products': Products.objects.all(),
+    }
+    return render(request, 'orders/order_form.html', context)

@@ -47,7 +47,7 @@
           <td>{{ delivery.id }}</td>
           <td>
             <strong class="{% if delivery.delivery_number %}text-success{% else %}text-warning{% endif %}">
-              {{ delivery.delivery_number|default:"未填写" }}
+              {{ delivery.delivery_number|default:"Not filled" }}
             </strong>
           </td>
           <td>
@@ -56,23 +56,23 @@
             </a>
           </td>
           <td>{{ delivery.customer.name|default:"-" }}</td>
-          <td>{{ delivery.delivery_date|date:"Y-m-d" }}</td>
+          <td>{{ delivery.delivery_date|date:"Y-m-d" }}</td>  
           <td>{{ delivery.vehicle_number }}</td>
           <td>{{ delivery.driver_phone }}</td>
           <td>
             {% if delivery.status == 'DELIVERED' %}
-              <span class="badge badge-success">已送达</span>
+              <span class="badge badge-success">Delivered</span>
             {% elif delivery.status == 'IN_TRANSIT' %}
-              <span class="badge badge-info">运输中</span>
+              <span class="badge badge-info">In Transit</span>
             {% elif delivery.status == 'PENDING' %}
-              <span class="badge badge-warning">待发货</span>
+              <span class="badge badge-warning">Pending</span>
             {% elif delivery.status == 'CANCELLED' %}
-              <span class="badge badge-danger">已取消</span>
+              <span class="badge badge-danger">Cancelled</span>
             {% endif %}
           </td>
           <td>
             {% if not delivery.delivery_number %}
-              <form method="POST" class="d-inline" onsubmit="return confirm('确认填写发货单号并标记为已发货？');">
+              <form method="POST" class="d-inline" onsubmit="return confirm('Confirm to fill in the delivery order number and mark as delivered?');">
                 {% csrf_token %}
                 <input type="hidden" name="delivery_id" value="{{ delivery.id }}">
                 <div class="input-group input-group-sm">
@@ -80,23 +80,23 @@
                     type="text" 
                     name="delivery_number" 
                     class="form-control" 
-                    placeholder="发货单号" 
+                    placeholder="Delivery Order Number" 
                     required
                     style="width: 120px;"
                   >
                   <div class="input-group-append">
-                    <button type="submit" class="btn btn-success btn-sm">确认</button>
+                    <button type="submit" class="btn btn-success btn-sm">Confirm</button>
                   </div>
                 </div>
               </form>
             {% else %}
-              <span class="text-success">已确认</span>
+              <span class="text-success">Confirmed</span>
             {% endif %}
           </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="9" class="text-center">没有找到发货单</td>
+          <td colspan="9" class="text-center">No delivery orders found</td>
         </tr>
         {% endfor %}
       </tbody>

@@ -14,6 +14,12 @@ def product_list(request):
         products = Products.objects.all()
 
     return render(request, 'products/product_list.html', {'products': products, 'query': query})
+
+class ProductCreateView(CreateView):
+    model = Products
+    template_name = 'products/product_form.html'
+    form_class = ProductForm
+    success_url = reverse_lazy('product_list')
     # model = Products
     # template_name = 'products/product_list.html'
     # context_object_name = 'products'

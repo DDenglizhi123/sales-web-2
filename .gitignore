@@ -36,4 +36,3 @@ venv/
 .DS_Store
 Thumbs.db
 EOF
-config/settings.py

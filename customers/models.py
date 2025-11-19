@@ -7,7 +7,7 @@ class Customer(models.Model):
     name = models.CharField(max_length=200, unique=True)
     name_in_short = models.CharField(max_length=10, blank=True, null=True)
     TIN = models.CharField(max_length=11, help_text='eg. xxx-xxx-xxx', blank=True, null=True, unique=True)
-    VRN = models.CharField(max_length=11, help_text='eg. xx-xxxxxx-x', blank=True, null=True, unique=True)
+    VRN = models.CharField(max_length=12, help_text='eg. xx-xxxxxx-x', blank=True, null=True, unique=True)
     contact_person = models.CharField(max_length=100, blank=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     emial = models.EmailField(blank=True, null=True)

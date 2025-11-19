@@ -12,7 +12,7 @@ def create_delivery(request):
     order_items_str = request.GET.get('order_items', '')
     
     if not order_id:
-        messages.error(request, '缺少订单ID')
+        messages.error(request, 'Missing order ID')
         return redirect('order_list')
     
     order = get_object_or_404(Order, id=order_id)
